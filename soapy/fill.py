@@ -1,9 +1,13 @@
 import json
 from util import expand
 
+
 class html_attr:
     def __init__(self, cfg_file):
         self.attr = {}
+        self.load(cfg_file)
+
+    def load(self, cfg_file):
         json_obj = json.loads(open(cfg_file).read())
         self.attr['title'] = json_obj['title'] if json_obj.__contains__('title') else 'welcome to soapy'
         if json_obj.__contains__('source_files'):
@@ -16,29 +20,86 @@ class html_attr:
         self.attr['subtitle1'] = json_obj['subtitle1'] if json_obj.__contains__('subtitle1') else 'subtitle1'
         self.attr['subtitle2'] = json_obj['subtitle2'] if json_obj.__contains__('subtitle2') else 'subtitle2'
 
+    def reload(self, cfg_file):
+        self.load(cfg_file)
+
     def get_attr(self):
         return self.attr
 
-    def reload(self):
-        pass
+    def set(self, key, val):
+        if key in self.attr.keys():
+            self.attr[key] = val
+            return True
+        else:
+            return False
+
 
 class html(html_attr):
-    pass
+    def __init__(self, cfg_file):
+        from lang import LANGUAGE_SUFFIX_DICT
+        html_attr.__init__(self, cfg_file)
+        self.lang = LANGUAGE_SUFFIX_DICT.get(self.attr.get('source_files')[0].split('.')[-1])
+        prefix_fmt = '''<!doctype html>\n \
+<html>\n \
+<head>\n \
+<title>%s</title>\n \
+<link href='%s' rel='stylesheet' type='text/css'/>\n \
+</head>\n \
+<body>\n \
+<h3>%s</h3>\n \
+<table class="simpletable">\n \
+<tr><td class="rowname">Files:</td>%s\n \
+<tr><td class="rowname">Entry:</td><td><a href="#Path1">%s</a></td></tr>\n \
+<tr><td class="rowname">Description:</td><td>%s</td></tr>\n \
+</table>\n \
+<h3>%s</h3>\n'''
+        files = ''
+        for k, fn in enumerate(self.attr.get('source_files')):
+            if k == 0:
+                files += '<td>%s</td>' % fn
+            else:
+                files += '</tr><tr><td></td><td>%s</td></tr>' % fn
+            if k != len(self.attr.get('source_files')) - 1:
+                files += '\n'
+        self.prefix = prefix_fmt % (self.attr.get('title'),
+                                    '%s_style.css' % self.lang,
+                                    self.attr.get('subtitle1'),
+                                    files,
+                                    self.attr.get('entry'),
+                                    self.attr.get('description'),
+                                    self.attr.get('subtitle2'))
+        self.suffix = '</body></html>'
+
+    def get_attr(self):
+        return self.attr
+
+    def get_lang(self):
+        return self.lang
+
+    def get_prefix(self):
+        return self.prefix
+
+    def get_suffix(self):
+        return self.suffix
+
 
 class filler:
-    def __init__(self, page):
-        pass
+    def __init__(self, output, cfg_file):
+        self.html_info = html(cfg_file)
+        self.output = output
 
     def fill_header(self):
-        pass
+        self.f.write(self.html_info.get_prefix())
 
     def fill_body(self):
         pass
 
     def fill_footer(self):
-        pass
+        self.f.write(self.html_info.get_suffix())
 
     def fill(self):
-        fill_header()
-        fill_body()
-        fill_footer()
+        self.f = file(self.output, 'w')
+        self.fill_header()
+        self.fill_body()
+        self.fill_footer()
+        self.f.close()

@@ -6,7 +6,9 @@ try:
 except:
     print 'optparse module required'
     exit(0)
-from soapy.conf import load_cfg
+
+from soapy.fill import filler
+#from soapy.conf import load_cfg
 #from soapy.fill import fill_header, fill_footer
 
 if __name__ == '__main__':
@@ -29,5 +31,7 @@ if __name__ == '__main__':
         print 'output file must be json format'
         sys.exit(0)
     else:
-        print load_cfg(options.config)
+        handler = filler(options.output, options.config)
+        handler.fill()
+        #print load_cfg(options.config)
         #fille_header()
