@@ -6,7 +6,7 @@ try:
 except:
     print 'optparse module required'
     exit(0)
-from soapy.config import load_cfg
+from soapy.conf import load_cfg
 #from soapy.fill import fill_header, fill_footer
 
 if __name__ == '__main__':
