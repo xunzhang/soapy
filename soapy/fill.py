@@ -36,23 +36,9 @@ class html_attr:
 
 class html(html_attr):
     def __init__(self, cfg_file):
-        from lang import LANGUAGE_SUFFIX_DICT
+        from var import LANGUAGE_SUFFIX_DICT, PREFIX_FMT
         html_attr.__init__(self, cfg_file)
         self.lang = LANGUAGE_SUFFIX_DICT.get(self.attr.get('source_files')[0].split('.')[-1])
-        prefix_fmt = '''<!doctype html>\n \
-<html>\n \
-<head>\n \
-<title>%s</title>\n \
-<link href='%s' rel='stylesheet' type='text/css'/>\n \
-</head>\n \
-<body>\n \
-<h3>%s</h3>\n \
-<table class="simpletable">\n \
-<tr><td class="rowname">Files:</td>%s\n \
-<tr><td class="rowname">Entry:</td><td><a href="#Path1">%s</a></td></tr>\n \
-<tr><td class="rowname">Description:</td><td>%s</td></tr>\n \
-</table>\n \
-<h3>%s</h3>\n'''
         files = ''
         for k, fn in enumerate(self.attr.get('source_files')):
             if k == 0:
@@ -61,7 +47,7 @@ class html(html_attr):
                 files += '</tr><tr><td></td><td>%s</td></tr>' % fn
             if k != len(self.attr.get('source_files')) - 1:
                 files += '\n'
-        self.prefix = prefix_fmt % (self.attr.get('title'),
+        self.prefix = PREFIX_FMT % (self.attr.get('title'),
                                     '%s_style.css' % self.lang,
                                     self.attr.get('subtitle1'),
                                     files,
