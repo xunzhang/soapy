@@ -1,3 +1,4 @@
+import os
 import json
 from util import expand
 
@@ -48,7 +49,7 @@ class html(html_attr):
             if k != len(self.attr.get('source_files')) - 1:
                 files += '\n'
         self.prefix = PREFIX_FMT % (self.attr.get('title'),
-                                    '%s_style.css' % self.lang,
+                                    open(os.path.dirname(__file__) + '/../stylesheets/%s_style.css' % self.lang).read() ,
                                     self.attr.get('subtitle1'),
                                     files,
                                     self.attr.get('entry'),
@@ -58,6 +59,9 @@ class html(html_attr):
 
     def get_attr(self):
         return self.attr
+
+    def get_source_files(self):
+        return self.attr.get('source_files')
 
     def get_lang(self):
         return self.lang
@@ -78,7 +82,9 @@ class filler:
         self.f.write(self.html_info.get_prefix())
 
     def fill_body(self):
-        pass
+        if self.html_info.get_lang() == 'cpp':
+            for fn in self.html_info.get_source_files():
+                cpp_filler(self.f, fn)
 
     def fill_footer(self):
         self.f.write(self.html_info.get_suffix())
@@ -89,3 +95,6 @@ class filler:
         self.fill_body()
         self.fill_footer()
         self.f.close()
+
+def cpp_filler(f_w, src_file):
+    line_counter = 1

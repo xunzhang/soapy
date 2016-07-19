@@ -2,7 +2,7 @@ PREFIX_FMT = '''<!doctype html>\n\
 <html>\n\
 <head>\n\
 <title>%s</title>\n\
-<link href='%s' rel='stylesheet' type='text/css'/>\n\
+<style type="text/css">%s</style>\n\
 </head>\n\
 <body>\n\
 <h3>%s</h3>\n\
