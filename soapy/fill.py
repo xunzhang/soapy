@@ -101,7 +101,7 @@ class filler:
     def cpp_filler(self, src_file):
         def cpp_html_span_fmt(s):
             from var import CODEWORD_FMT, CPP_KEYWORDS
-            words = s.strip().split()
+            words = s.strip('\n').split(' ')
             # empty line
             if len(words) == 0:
                 return ' '
@@ -116,6 +116,8 @@ class filler:
                 for word in words:
                     if word in CPP_KEYWORDS:
                         result += CODEWORD_FMT % ('', 'keyword', fmt_html(word), '')
+                    elif not len(word):
+                        result += ' '
                     else:
                         result += fmt_html(word) + ' '
                 return result
