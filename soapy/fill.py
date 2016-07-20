@@ -1,6 +1,6 @@
 import os
 import json
-from util import expand
+from util import expand, fmt_html
 
 
 class html_attr:
@@ -83,8 +83,10 @@ class filler:
 
     def fill_body(self):
         if self.html_info.get_lang() == 'cpp':
+            self.f.write('<table class="code">')
             for fn in self.html_info.get_source_files():
-                cpp_filler(self.f, fn)
+                self.cpp_filler(fn)
+            self.f.write('</table>')
 
     def fill_footer(self):
         self.f.write(self.html_info.get_suffix())
@@ -96,5 +98,31 @@ class filler:
         self.fill_footer()
         self.f.close()
 
-def cpp_filler(f_w, src_file):
-    line_counter = 1
+    def cpp_filler(self, src_file):
+        def cpp_html_span_fmt(s):
+            from var import CODEWORD_FMT, CPP_KEYWORDS
+            words = s.strip().split()
+            # empty line
+            if len(words) == 0:
+                return ' '
+            # comment line
+            elif words[0].startswith('/') or words[0].startswith('*'):
+                return CODEWORD_FMT % ('', 'comment', fmt_html(s), '')
+            # macro line
+            elif words[0].startswith('#'):
+                return CODEWORD_FMT % ('', 'directive', fmt_html(s), '')
+            else:
+                result = ''
+                for word in words:
+                    if word in CPP_KEYWORDS:
+                        result += CODEWORD_FMT % ('', 'keyword', fmt_html(word), '')
+                    else:
+                        result += fmt_html(word) + ' '
+                return result
+
+        from var import CODELINE_FMT
+        f_in = file(src_file)
+        for line_cnt, line in enumerate(f_in):
+            html_rep = cpp_html_span_fmt(line)
+            self.f.write(CODELINE_FMT % (line_cnt + 1, line_cnt + 1, html_rep))
+        f_in.close()

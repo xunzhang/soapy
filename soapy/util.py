@@ -29,3 +29,13 @@ def expand(fns):
         return expand_dir_rec(fns)
     else:
         return glob.glob(fns)
+
+def fmt_html(s):
+    from var import HTML_SHIFT_DICT
+    ss = ''
+    for k, ch in enumerate(s):
+        if HTML_SHIFT_DICT.get(ch):
+            ss += HTML_SHIFT_DICT[ch]
+        else:
+            ss += ch
+    return ss
